@@ -2508,6 +2508,329 @@ double w_ks_tomo_flatsky(const double theta, const int ni, const int limber)
 }
 
 // ----------------------------------------------------------------------------
+
+double DeltaSigma_flatsky(const double R, const int ni, const int limber)
+{
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static double** table;
+
+  const int NSIZE = tomo.ggl_Npowerspectra; //Ask Tim and Elisabeth if this condition is appropriate.ggl_Npowerspectra includes all lens bin and source bin for DeltaSigma, only lens redshift is relevant.
+  const int nR = Ntable.N_RH;
+  const double k_min = limits.k_min_hankel;
+  const double k_max = limits.k_max_hankel;
+  const double lnkmax = log(k_max);
+  const double lnkmin = log(k_min);
+  const double dlnk = (lnkmax - lnkmin)/((double) nR - 1.0);
+  const double lnrc = 0.5*(lnkmax + lnkmin);
+  const double nc = nR/2 + 1;
+  const double lnRmin = (nc - nR + 1)*dlnk - lnrc;
+  const double lnRmax = nc*dlnk - lnrc;
+  const double dlnR = (lnRmax - lnRmin)/((double) nR);
+
+  if (table == 0)
+  {
+    table = (double**) malloc(sizeof(double*)*NSIZE);
+    if (table == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<NSIZE; i++) 
+    {
+      table[i] = (double*) malloc(sizeof(double)*nR);
+      if (table[i] == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+  }
+
+  if (recompute_gs(C, G, N)) //Ask Tim and Elisabeth if this condition is appropriate. 
+  {
+    typedef fftw_complex fftwZ;
+
+    fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE); // go to log-Fourier-space
+    if (flP == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int j=0; j<NSIZE; j++)
+    {
+      flP[j] = fftw_malloc((nR/2 + 1)*sizeof(fftwZ));
+      if (flP[j] == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+    {
+      double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+      if (lP == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      if (plan == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int j=0; j<NSIZE; j++)
+      {
+        lP[j] = (double*) malloc(nR*sizeof(double));
+        if (lP[j] == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        plan[j] = fftw_plan_dft_r2c_1d(nR, lP[j], flP[j], FFTW_ESTIMATE);
+      }
+      // --------------------------------------------------------------------------------
+      // Power spectrum on logarithmic bins (begins) 
+      // --------------------------------------------------------------------------------
+      gsl_spline** fCL_NL = NULL; 
+      
+      if (limber != 1)
+      { 
+        fCL_NL = (gsl_spline**) malloc(sizeof(gsl_spline*)*NSIZE);
+        if (fCL_NL == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+
+        double** Cl_NL = (double**) malloc(sizeof(double*)*NSIZE);
+        if (Cl_NL == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        for (int i=0; i<NSIZE; i++)
+        {
+          Cl_NL[i] = calloc(limits.LMAX_NOLIMBER, sizeof(double));
+          if (Cl_NL[i] == NULL)
+          {
+            log_fatal("array allocation failed");
+            exit(1);
+          }
+        }
+        
+        double* ll = calloc(limits.LMAX_NOLIMBER, sizeof(double));
+        if (ll == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        for (int i=0; i<limits.LMAX_NOLIMBER; i++)
+        {
+          ll[i] = i;
+        }
+
+        const int L = 1;
+        const double tolerance = 0.0075;    // required fractional accuracy in C(l)
+        const double dev = 10. * tolerance; // will be diff exact vs Limber init to large
+                                            // value in order to start while loop
+        for (int k=0; k<NSIZE; k++)
+        { // Cocoa: no threading allowed here - (fftw allocation @C_gl_tomo)
+          const int Z1 = ZL(k);
+          const int Z2 = ZS(k);
+          C_gl_tomo(L, Z1, Z2, Cl_NL[k], dev, tolerance);
+
+          const gsl_interp_type* T = gsl_interp_linear;
+          fCL_NL[k] = gsl_spline_alloc(T, limits.LMAX_NOLIMBER);
+          if (fCL_NL[k] == NULL)
+          {
+            log_fatal("fail allocation");
+            exit(1);
+          }
+        }
+        #pragma omp parallel for
+        for (int k=0; k<NSIZE; k++)
+        {
+          int status = gsl_spline_init(fCL_NL[k], ll, Cl_NL[k], limits.LMAX_NOLIMBER);
+          if (status) 
+          {
+            log_fatal(gsl_strerror(status));
+            exit(1);
+          }
+        }
+        for (int i=0; i<NSIZE; i++)
+        {
+          free(Cl_NL[i]);   // gsl_spline_init copies the data
+        }
+        free(Cl_NL);        // gsl_spline_init copies the data
+        free(ll);           // gsl_spline_init copies the data
+      }
+      
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wunused-variable"
+      {
+        double init_static_vars_only = C_gs_tomo_limber(limits.LMIN_tab + 1, ZL(0), ZS(0), 0);
+      }
+      #pragma GCC diagnostic pop
+      
+      #pragma omp parallel for collapse(2)
+      for (int k=0; k<NSIZE; k++)
+      {
+        for (int p=0; p<nR; p++)
+        {
+          const int ZLNZ = ZL(k);
+          const int ZSNZ = ZS(k);
+          const double l = exp(lnrc + (p - nc)*dlnk);
+          if (limber == 1 || (limber != 1 && l > limits.LMAX_NOLIMBER - 1))
+          {
+            lP[k][p] = (l > limits.LMIN_tab) ?
+              l*C_gs_tomo_limber(l, ZLNZ, ZSNZ, 1) :
+              l*C_gs_tomo_limber_nointerp(l, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
+          }
+          else
+          {
+            double CLNL;
+            int status = gsl_spline_eval_e(fCL_NL[k], l, NULL, &CLNL);
+            if (status) 
+            {
+              log_fatal(gsl_strerror(status));
+              exit(1);
+            }
+            lP[k][p] = l*CLNL;
+          }
+        }
+      }
+      if (limber != 1)
+      {
+        for (int i=0; i<NSIZE; i++)
+        {
+           gsl_spline_free(fCL_NL[i]);
+        }
+        free(fCL_NL);
+      }
+      // --------------------------------------------------------------------------------
+      // Power spectrum on logarithmic bins (ends)
+      // --------------------------------------------------------------------------------
+      #pragma omp parallel for
+      for (int j=0; j<NSIZE; j++)
+      {
+        fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+      }
+      for (int j=0; j<NSIZE; j++)
+      {
+        fftw_free(lP[j]);
+        fftw_destroy_plan(plan[j]);
+      }
+      free(lP);
+      free(plan);
+    }
+
+    double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+    fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+    fftwZ** conv = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+    fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+    double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
+    for (int j=0; j<NSIZE; j++)
+    {
+      const int COVSZ = (nR/2+1);
+      lP[j] = (double*) malloc(nR*sizeof(double));
+      kernel[j] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
+      conv[j] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
+      plan[j] = fftw_plan_dft_c2r_1d(nR, conv[j], lP[j], FFTW_ESTIMATE);
+      tab[j] = (double**) malloc(sizeof(double*)*1);
+      tab[j][0] = (double*) malloc(sizeof(double)*nR);
+    }
+    #pragma omp parallel for
+    for (int j=0; j<NSIZE; j++)
+    {
+      double arg[2];
+      arg[0] = 0; // bias
+      arg[1] = 2; // order of Bessel function
+
+      for (int i=0; i<(ntheta/2+1); i++)
+      {
+        const double kk = 2*M_PI*i/(dlnk*nR);
+        hankel_kernel_FT(kk, kernel[j], arg, 2);
+        conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] - flP[j][i][1]*kernel[j][0][1];
+        conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] + flP[j][i][0]*kernel[j][0][1];
+      }
+
+      // force Nyquist- and 0-frequency-components to be double
+      conv[j][0][1] = 0;
+      conv[j][nR/2][1] = 0;
+
+      fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+
+      for (int k=0; k<nR; k++)
+      {
+        const double t = exp((nc - k)*dlnk - lnrc); // theta=1/l
+        tab[j][0][nR-k-1] = lP[j][k]/(t*2*M_PI*nR);
+      }
+      
+      for (int k=0; k<nR; k++)
+      {
+        table[j][k] = tab[j][0][k];
+      }
+    }
+    for (int j=0; j<NSIZE; j++)
+    {
+      fftw_free(flP[j]);
+      fftw_free(lP[j]);
+      fftw_free(conv[j]);
+      fftw_free(kernel[j]);
+      fftw_destroy_plan(plan[j]);
+      free(tab[j][0]);
+      free(tab[j]);
+    }
+    free(flP);
+    free(lP);
+    free(conv);
+    free(kernel);
+    free(plan);
+    free(tab);
+
+    update_cosmopara(&C);
+    update_galpara(&G);
+    update_nuisance(&N);
+  }
+
+  //if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni);
+    exit(1);
+  }
+  
+  const double lnR = log(R);
+  
+  if (lnR < lnRmin || lnR > lnRmax)
+  {
+    const double R = exp(lnR);
+    const double R_min = exp(lnRmin);
+    const double R_max = exp(lnRmax);
+    log_fatal("R = %e outside look-up table range [%e, %e]", R, R_min, R_max);
+    exit(1);
+  }
+  
+  if (test_zoverlap(ni, nj))
+  {
+    const int q = N_ggl(ni, nj);
+    if (q  < 0 || q > NSIZE - 1)
+    {
+      log_fatal("internal logic error in selecting bin number");
+      exit(1);
+    }
+    return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 1, 1);
+  } 
+  else
+  {
+    return 0.0;
+  }
+}
+
+
+// ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // Limber Approximation (Angular Power Spectrum)
