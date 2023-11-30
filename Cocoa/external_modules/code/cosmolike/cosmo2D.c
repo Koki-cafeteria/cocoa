@@ -2748,7 +2748,7 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
       arg[0] = 0; // bias
       arg[1] = 2; // order of Bessel function
 
-      for (int i=0; i<(ntheta/2+1); i++)
+      for (int i=0; i<(nR/2+1); i++)
       {
         const double kk = 2*M_PI*i/(dlnk*nR);
         hankel_kernel_FT(kk, kernel[j], arg, 2);
@@ -2821,7 +2821,7 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
       log_fatal("internal logic error in selecting bin number");
       exit(1);
     }
-    return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 1, 1);
+    return interpol(table[q], nR, lnRmin, lnRmax, dlnR, lnR, 1, 1);
   } 
   else
   {

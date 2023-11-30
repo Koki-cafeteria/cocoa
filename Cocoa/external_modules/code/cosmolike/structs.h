@@ -22,6 +22,8 @@ typedef struct
   int LMAX;
   double LMIN_hankel;
   double LMAX_hankel;
+  double k_min_hankel; //cosmo2D.c k_min added to compute DeltaSigma(R) and w_p(R)) 
+  double k_max_hankel; //cosmo2D.c k_min added to compute DeltaSigma(R) and w_p(R))
   double cluster_util_log_M_min;
   double cluster_util_log_M_max;
   double binned_P_lambda_obs_given_M_zmin_table;
@@ -64,6 +66,7 @@ typedef struct
   int N_k_halo_exclusion;          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   int N_k_hankel_halo_exclusion;   // N for 3D Hankel Transform (pk_to_xi and xi_to_pk)
   int N_R_halo_exclusion;
+  int N_RH;                        // Cosmo2D computing DeltaSigma(R) and w_p(R)
   int binned_P_lambda_obs_given_M_size_z_table;
   int binned_P_lambda_obs_given_M_size_M_table;
   int binned_p_cm_size_a_table;
