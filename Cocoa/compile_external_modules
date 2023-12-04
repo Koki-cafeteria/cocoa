@@ -19,9 +19,10 @@ fi
 
 echo 'INSTALLING COBAYA VIA PIP'
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local \
-        --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-        --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    #$PIP3 install --editable cobaya --prefix=$ROOTDIR/.local \
+    #    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
+    #    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    $PIP3 install -e ./cobaya
     if [ $? -ne 0 ]; then
       echo "PROBLEM PIP INSTALL COBAYA" >&2
       return 1

@@ -17,11 +17,12 @@ likepara like =
   .bias = 0,
   .ell = NULL,
   .theta = NULL,
+  .R = NULL, //for R of DeltaSigma(R) and w_p(R) 
   .shear_shear = 0,
   .shear_pos = 0,
   .pos_pos = 0,
-  .shear_pos_flat = 0; //for DeltaSigma(R)
-  .pos_pos_flat = 0;   //for w_p(R)
+  .shear_pos_flat = 0, //for DeltaSigma(R)
+  .pos_pos_flat = 0,   //for w_p(R)
   .gk = 0,
   .kk = 0,
   .ks = 0,
@@ -266,12 +267,15 @@ void reset_like_struct()
   like.bias = 0;
   like.Ncl = 0;
   like.Ntheta = 0;
+  like.NR =0; //for R of DeltaSigma(R) and w_p(R)
   like.Ncos = 0;
   like.Ndata = 0;
   like.lmin = 0;
   like.lmax = 0;
   like.vtmax = 0;
   like.vtmin = 0;
+  like.Rmax = 0; //for R of DeltaSigma(R) and w_p(R) 
+  like.Rmin = 0; //for R of DeltaSigma(R) and w_p(R) 
   if((like.ell != NULL) == 1)
   {
     free(like.ell);
@@ -282,6 +286,12 @@ void reset_like_struct()
     free(like.theta);
     like.theta = NULL;
   }
+  if((like.R != NULL) == 1)                                                          
+  { 
+    free(like.R);
+    like.theta = NULL;                                                                   
+  }
+
   like.cosmax = 0;
   like.Rmin_bias = 0;
   like.Rmin_shear = 0;

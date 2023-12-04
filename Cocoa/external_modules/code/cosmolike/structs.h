@@ -262,6 +262,7 @@ typedef struct
   double alpha_Hartlap_kkkk;
   int Ncl;
   int Ntheta;
+  int NR; //for DeltaSigma(R) and w_p(R)
   int Ncos;
   int Ndata;
   int Nbp; // number of band-power bins for CMB lensing
@@ -269,8 +270,11 @@ typedef struct
   double lmax;
   double vtmax;
   double vtmin;
+  double Rmax; //for R of DeltaSigma(R) and w_p(R) 
+  double Rmin; //for R of DeltaSigma(R) and w_p(R) 
   double* ell;
   double* theta;
+  double* R; //for R of DeltaSigma(R) and w_p(R)  
   double cosmax;
   double Rmin_bias;
   double Rmin_shear;
@@ -284,6 +288,8 @@ typedef struct
   int shear_shear;
   int shear_pos;
   int pos_pos;
+  int shear_pos_flat; //for DeltaSigma(R)
+  int pos_pos_flat;   //for w_p(R)
   int gk;
   int kk;
   int ks;
