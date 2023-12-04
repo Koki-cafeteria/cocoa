@@ -291,7 +291,6 @@ void reset_like_struct()
     free(like.R);
     like.theta = NULL;                                                                   
   }
-
   like.cosmax = 0;
   like.Rmin_bias = 0;
   like.Rmin_shear = 0;
