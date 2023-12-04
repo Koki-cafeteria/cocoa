@@ -289,7 +289,7 @@ void reset_like_struct()
   if((like.R != NULL) == 1)                                                          
   { 
     free(like.R);
-    like.theta = NULL;                                                                   
+    like.R = NULL;                                                                   
   }
   like.cosmax = 0;
   like.Rmin_bias = 0;
