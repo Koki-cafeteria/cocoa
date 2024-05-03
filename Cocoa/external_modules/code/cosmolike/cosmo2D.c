@@ -2615,7 +2615,7 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       for (int j=0; j<NSIZE; j++)
       {
         fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-        //printf("fftw1 %f", plan[j]);
+        printf("fftw1 %f", plan[j]);
       }
       for (int j=0; j<NSIZE; j++)
       {
