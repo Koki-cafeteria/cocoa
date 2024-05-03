@@ -53,7 +53,7 @@ double w_gk_tomo_flatsky(double theta, int ni, int limber);
 
 double w_ks_tomo_flatsky(double theta, int ni, int limber);
 
-double DeltaSigma_flatsky(double R, int ni, int limber);
+double DeltaSigma_flatsky(double R, int ni, int nj, int limber);
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

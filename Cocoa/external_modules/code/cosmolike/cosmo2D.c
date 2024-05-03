@@ -2509,7 +2509,7 @@ double w_ks_tomo_flatsky(const double theta, const int ni, const int limber)
 
 // ----------------------------------------------------------------------------
 
-double DeltaSigma_flatsky(const double R, const int ni, const int limber)
+double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int limber)
 {
   static cosmopara C;
   static nuisancepara N;
@@ -2601,10 +2601,12 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
         {
           const int ZLNZ = ZL(m);
           const double k = exp(lnrc + (p - nc)*dlnk);
-          const double aLNZ = 1.0/(ZLNZ + 1.0);
- 
+          //const double aLNZ = 1.0/(ZLNZ + 1.0);
+          const double aLNZ = 1.0/(zmean(m) + 1.0);
+          //printf("ZLNZ[%d] = %f\n", m, zmean(m));//for debug 24/05/03 
           lP[m][p] = p_lin(k, aLNZ);
         }
+        //printf("ZLNZ[%d] = %f\n", 1, lP[1][10]);//for debug 24/05/03 
       }
       // --------------------------------------------------------------------------------
       // Power spectrum on logarithmic bins (ends)
@@ -2613,6 +2615,7 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
       for (int j=0; j<NSIZE; j++)
       {
         fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+        //printf("fftw1 %f", plan[j]);
       }
       for (int j=0; j<NSIZE; j++)
       {
@@ -2622,6 +2625,7 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
       free(lP);
       free(plan);
     }
+    //printf("fftw1_0[%f]_1000[%f]_2000[%f]", flP[0], flP[1000][0], flP[2000][0]);//for debug 24/05/03 
 
     double** lP = (double**) malloc(sizeof(double*)*NSIZE);
     fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
@@ -2691,16 +2695,18 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
     update_galpara(&G);
     update_nuisance(&N);
   }
-
-  //if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni != nj) 
   {
-    log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni);
+    log_fatal("cross-tomography not supported");
     exit(1);
   }
-  
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.clustering_Nbin - 1)
+  //if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("error in selecting bin number (ni, nj) = [%d, %d]", ni, nj);
+    exit(1);
+  } 
   const double lnR = log(R);
-  
   if (lnR < lnRmin || lnR > lnRmax)
   {
     const double R = exp(lnR);
@@ -2709,7 +2715,13 @@ double DeltaSigma_flatsky(const double R, const int ni, const int limber)
     log_fatal("R = %e outside look-up table range [%e, %e]", R, R_min, R_max);
     exit(1);
   }
-  
+  const int q = ni;
+  if (q < 0 || q > NSIZE - 1)
+  {
+    log_fatal("internal logic error in selecting bin number");
+    exit(1);
+  }
+  return interpol(table[q], nR, lnRmin, lnRmax, dlnR, lnR, 1, 1);
 }
 
 
