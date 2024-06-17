@@ -184,8 +184,8 @@ lim limits =
   .LMAX = 100000,
   .LMIN_hankel = 0.0001,
   .LMAX_hankel = 5.0e6,
-  .k_min_hankel = 1.e-3,        // k_min for Hankel (added to compute DeltaSigma(R) and w_p(R))
-  .k_max_hankel = 1.e3,         // k_max for Hankel (added to compute DeltaSigma(R) and w_p(R))
+  .k_min_hankel = 0.0001,        // k_min for Hankel (added to compute DeltaSigma(R) and w_p(R))
+  .k_max_hankel = 1.0e6,         // k_max for Hankel (added to compute DeltaSigma(R) and w_p(R))
   .cluster_util_log_M_min = 12.0,
   .cluster_util_log_M_max = 15.9,
   .binned_P_lambda_obs_given_M_zmin_table = 0.20,
@@ -306,6 +306,10 @@ void reset_like_struct()
   like.shear_shear = 0;
   like.shear_pos = 0;
   like.pos_pos = 0;
+
+  like.shear_pos_flat = 0, //for DeltaSigma(R)
+  like.pos_pos_flat = 0,   //for w_p(R)
+
   like.gk = 0;
   like.kk = 0;
   like.ks = 0;

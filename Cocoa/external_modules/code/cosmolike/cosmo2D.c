@@ -2568,13 +2568,15 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       }
     }
     {
-      double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+      //double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+      double** lP = (double**) calloc(NSIZE, sizeof(double*));
       if (lP == NULL)
       {
         log_fatal("array allocation failed");
         exit(1);
       }
-      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      //fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      fftw_plan* plan = (fftw_plan*) calloc(NSIZE, sizeof(fftw_plan));
       if (plan == NULL)
       {
         log_fatal("array allocation failed");
@@ -2582,7 +2584,8 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       }
       for (int j=0; j<NSIZE; j++)
       {
-        lP[j] = (double*) malloc(nR*sizeof(double));
+        //lP[j] = (double*) malloc(nR*sizeof(double));
+        lP[j] = (double*) calloc(nR, sizeof(double));
         if (lP[j] == NULL)
         {
           log_fatal("array allocation failed");
@@ -2603,10 +2606,18 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
           const double k = exp(lnrc + (p - nc)*dlnk);
           //const double aLNZ = 1.0/(ZLNZ + 1.0);
           const double aLNZ = 1.0/(zmean(m) + 1.0);
-          //printf("ZLNZ[%d] = %f\n", m, zmean(m));//for debug 24/05/03 
-          lP[m][p] = p_lin(k, aLNZ);
+          //printf("ZLNZ[%d] = %f\n", m, zmean(m));//for debug 24/05/03
+          //printf("k:%f", k); 
+          lP[m][p] = p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3);
+          //printf("%f %f\n", k/0.7, p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));//for debug 24/05/03 
+          //printf("lP[%d][%d] = %f\n", m, p, pow(299792.458, 3)*lP[m][p]);
         }
-        //printf("ZLNZ[%d] = %f\n", 1, lP[1][10]);//for debug 24/05/03 
+        //for (int p = 0; p < 3; p++)
+        //{
+          //printf("lP[0][%d] = %f\n \n", p, p_lin(k, aLNZ));
+          //printf("lP[0][%d] = %f\n", p, lP[0][p]);
+        //}
+        //printf("ZLNZ[%d] = %f %f %f\n", 0, lP[0][10], lP[0][100], lP[0][1000]);//for debug 24/05/03 
       }
       // --------------------------------------------------------------------------------
       // Power spectrum on logarithmic bins (ends)
@@ -2615,7 +2626,6 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       for (int j=0; j<NSIZE; j++)
       {
         fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-        printf("fftw1 %f", plan[j]);
       }
       for (int j=0; j<NSIZE; j++)
       {
@@ -2625,7 +2635,14 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       free(lP);
       free(plan);
     }
-    //printf("fftw1_0[%f]_1000[%f]_2000[%f]", flP[0], flP[1000][0], flP[2000][0]);//for debug 24/05/03 
+      for (int j = 0; j < NSIZE; j++)
+      {
+        for (int i = 0; i < nR/2 + 1; i++)
+        {
+        printf("flP[%d][%d] = (%f, %f)\n", j, i, flP[j][i][0], flP[j][i][1]);
+        }
+      }
+    //printf("fftw1_0[%f]_1000[%f]_2000[%f]", sizeof(flP[0]), flP[1000][0], flP[2000][0]);//for debug 24/05/03 
 
     double** lP = (double**) malloc(sizeof(double*)*NSIZE);
     fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
@@ -2652,9 +2669,18 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       for (int i=0; i<(nR/2+1); i++)
       {
         const double kk = 2*M_PI*i/(dlnk*nR);
+        printf("kk[%d] = %f\n", i, kk);
+
         hankel_kernel_FT(kk, kernel[j], arg, 2);
+        
+        // Debug output for kernel
+        printf("kernel[%d][%d] = (%f, %f)\n", j, i, kernel[j][0][0], kernel[j][0][1]);
+   
         conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] - flP[j][i][1]*kernel[j][0][1];
         conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] + flP[j][i][0]*kernel[j][0][1];
+      
+        // Debug output for conv
+        printf("conv[%d][%d] = (%f, %f)\n", j, i, conv[j][i][0], conv[j][i][1]);
       }
 
       // force Nyquist- and 0-frequency-components to be double
@@ -2672,6 +2698,14 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       for (int k=0; k<nR; k++)
       {
         table[j][k] = tab[j][0][k];
+      }
+    }
+    // Print all elements of lP
+    for (int j = 0; j < NSIZE; j++)
+    {
+      for (int k = 0; k < nR; k++)
+      {
+        printf("lP[%d][%d] = %f\n", j, k, lP[j][k]);
       }
     }
     for (int j=0; j<NSIZE; j++)
