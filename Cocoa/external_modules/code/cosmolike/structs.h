@@ -111,9 +111,9 @@ typedef struct
   double MGmu;
   double sigma_8;
   double random; // Random number between zero and 1 - see interface.cpp
-  //double w0;
+  double w0;
   //double A_s;
-  //double n_s;
+  double n_s;
   int is_cached;
 } cosmopara;
 

@@ -56,9 +56,9 @@ cosmopara cosmology =
   .Omega_b = 0.0,
   .Omega_v = 0.0,
   .h0 = 0.0,
-  //.w0 = -1,
+  .w0 = -1,
   //.A_s =  2e-9,
-  //.n_s = 0.96,
+  .n_s = 0.96,
   .is_cached = 0
 };
 
@@ -182,10 +182,10 @@ lim limits =
   .LMIN_tab = 20,               // LMIN_tab
   .LMAX_NOLIMBER = 250,         // LMAX_NOLIMBER
   .LMAX = 100000,
-  .LMIN_hankel = 0.0001,
+  .LMIN_hankel = 0.0005,
   .LMAX_hankel = 5.0e6,
-  .k_min_hankel = 0.0001,        // k_min for Hankel (added to compute DeltaSigma(R) and w_p(R))
-  .k_max_hankel = 1.0e6,         // k_max for Hankel (added to compute DeltaSigma(R) and w_p(R))
+  .k_min_hankel = 0.001,        // k_min for Hankel (added to compute DeltaSigma(R) and w_p(R))
+  .k_max_hankel = 1.0e4,//.k_max_hankel = 1.0e8,         // k_max for Hankel (added to compute DeltaSigma(R) and w_p(R))
   .cluster_util_log_M_min = 12.0,
   .cluster_util_log_M_max = 15.9,
   .binned_P_lambda_obs_given_M_zmin_table = 0.20,
@@ -220,7 +220,7 @@ Ntab Ntable =
   .N_k_halo_exclusion = 100,          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   .N_k_hankel_halo_exclusion = 3192,  // N for 3D Hankel Transform (pk_to_xi and xi_to_pk) 
   .N_R_halo_exclusion = 64,
-  .N_RH = 2048,                       // N R for Hankel (added to compute DeltaSigma(R) and w_p(R))
+  .N_RH = 1500,//.N_RH = 2048, 3600                       // N R for Hankel (added to compute DeltaSigma(R) and w_p(R))
   .binned_P_lambda_obs_given_M_size_z_table = 10,
   .binned_P_lambda_obs_given_M_size_M_table = 50,
   .binned_p_cm_size_a_table = 30,

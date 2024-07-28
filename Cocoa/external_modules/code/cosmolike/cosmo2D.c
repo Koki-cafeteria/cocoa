@@ -2595,22 +2595,35 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       }
       // --------------------------------------------------------------------------------
       // Power spectrum on logarithmic bins (begins) 
-      // --------------------------------------------------------------------------------
-           
+      // --------------------------------------------------------------------------------    
+      FILE *fp;
+      fp = fopen("/home/tanida/cocoa_private/test_Pk_compare/cocoa_pk.dat", "w");
+      if (fp == NULL) {
+          perror("Error opening file");
+          return 1;
+      }
       #pragma omp parallel for collapse(2)
       for (int m=0; m<NSIZE; m++)
       {
         for (int p=0; p<nR; p++)
         {
           const int ZLNZ = ZL(m);
-          const double k = exp(lnrc + (p - nc)*dlnk);
+          const double k = exp(lnrc + (p - nc)*dlnk);//[h(Mpc)^-1]?
+          
           //const double aLNZ = 1.0/(ZLNZ + 1.0);
           const double aLNZ = 1.0/(zmean(m) + 1.0);
+          //const double aLNZ = 1.0/(0.2607 + 1.0);
+          
           //printf("ZLNZ[%d] = %f\n", m, zmean(m));//for debug 24/05/03
-          //printf("k:%f", k); 
-          lP[m][p] = p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3);
+          
+          //lP[m][p] = ((2.77536627*pow(10,11))*pow(10, -12)) * k * (p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));//<-back to here
+          lP[m][p] =  k * (p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3)) * (2.77536627*1e11) * cosmology.Omega_m *1e-12;
+          fprintf(fp,"%f %f\n", k, p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));
+          //lP[m][p] = exp(-aLNZ*aLNZ * k*k); //test for J0 hankel of Gaussian
+          //printf("rho_crit:%f", cosmology.rho_crit);
+          //printf("Omega_m:%f", cosmology.Omega_m);
+            
           //printf("%f %f\n", k/0.7, p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));//for debug 24/05/03 
-          //printf("lP[%d][%d] = %f\n", m, p, pow(299792.458, 3)*lP[m][p]);
         }
         //for (int p = 0; p < 3; p++)
         //{
@@ -2619,6 +2632,7 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
         //}
         //printf("ZLNZ[%d] = %f %f %f\n", 0, lP[0][10], lP[0][100], lP[0][1000]);//for debug 24/05/03 
       }
+      fclose(fp);
       // --------------------------------------------------------------------------------
       // Power spectrum on logarithmic bins (ends)
       // --------------------------------------------------------------------------------
@@ -2639,11 +2653,9 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       {
         for (int i = 0; i < nR/2 + 1; i++)
         {
-        printf("flP[%d][%d] = (%f, %f)\n", j, i, flP[j][i][0], flP[j][i][1]);
+        //printf("flP[%d][%d] = (%f, %f)\n", j, i, flP[j][i][0], flP[j][i][1]);
         }
       }
-    //printf("fftw1_0[%f]_1000[%f]_2000[%f]", sizeof(flP[0]), flP[1000][0], flP[2000][0]);//for debug 24/05/03 
-
     double** lP = (double**) malloc(sizeof(double*)*NSIZE);
     fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
     fftwZ** conv = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
@@ -2665,22 +2677,23 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       double arg[2];
       arg[0] = 0; // bias
       arg[1] = 2; // order of Bessel function
+      //arg[1] = 0; // test for hankel transform of Gaussian 240712
 
       for (int i=0; i<(nR/2+1); i++)
       {
         const double kk = 2*M_PI*i/(dlnk*nR);
-        printf("kk[%d] = %f\n", i, kk);
+        //printf("kk[%d] = %f\n", i, kk);
 
         hankel_kernel_FT(kk, kernel[j], arg, 2);
         
         // Debug output for kernel
-        printf("kernel[%d][%d] = (%f, %f)\n", j, i, kernel[j][0][0], kernel[j][0][1]);
+        //printf("kernel[%d][%d] = (%f, %f)\n", j, i, kernel[j][0][0], kernel[j][0][1]);
    
         conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] - flP[j][i][1]*kernel[j][0][1];
         conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] + flP[j][i][0]*kernel[j][0][1];
       
         // Debug output for conv
-        printf("conv[%d][%d] = (%f, %f)\n", j, i, conv[j][i][0], conv[j][i][1]);
+        //printf("conv[%d][%d] = (%f, %f)\n", j, i, conv[j][i][0], conv[j][i][1]);
       }
 
       // force Nyquist- and 0-frequency-components to be double
@@ -2701,11 +2714,249 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
       }
     }
     // Print all elements of lP
-    for (int j = 0; j < NSIZE; j++)
+    //for (int j = 0; j < NSIZE; j++)
+    //{
+    //  for (int k = 0; k < nR; k++)
+    //  {
+    //    //printf("lP[%d][%d] = %f\n", j, k, lP[j][k]);
+    //  }
+    //}
+    for (int j=0; j<NSIZE; j++)
     {
-      for (int k = 0; k < nR; k++)
+      fftw_free(flP[j]);
+      fftw_free(lP[j]);
+      fftw_free(conv[j]);
+      fftw_free(kernel[j]);
+      fftw_destroy_plan(plan[j]);
+      free(tab[j][0]);
+      free(tab[j]);
+    }
+    free(flP);
+    free(lP);
+    free(conv);
+    free(kernel);
+    free(plan);
+    free(tab);
+
+    update_cosmopara(&C);
+    update_galpara(&G);
+    update_nuisance(&N);
+  }
+  if (ni != nj) 
+  {
+    log_fatal("cross-tomography not supported");
+    exit(1);
+  }
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.clustering_Nbin - 1)
+  //if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1) /*240711*/ ->error
+  {
+    log_fatal("error in selecting bin number (ni, nj) = [%d, %d]", ni, nj);
+    exit(1);
+  } 
+  const double lnR = log(R);
+  if (lnR < lnRmin || lnR > lnRmax)
+  {
+    const double R = exp(lnR);
+    const double R_min = exp(lnRmin);
+    const double R_max = exp(lnRmax);
+    log_fatal("R = %e outside look-up table range [%e, %e]", R, R_min, R_max);
+    exit(1);
+  }
+  const int q = ni;
+  if (q < 0 || q > NSIZE - 1)
+  {
+    log_fatal("internal logic error in selecting bin number");
+    exit(1);
+  }
+  return interpol(table[q], nR, lnRmin, lnRmax, dlnR, lnR, 1, 1);
+}
+
+
+double w_p_flatsky(const double R, const int ni, const int nj, const int limber)
+{
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static double** table;
+
+  const int NSIZE = tomo.clustering_Npowerspectra; 
+  const int nR = Ntable.N_RH;
+  const double k_min = limits.k_min_hankel;
+  const double k_max = limits.k_max_hankel;
+  const double lnkmax = log(k_max);
+  const double lnkmin = log(k_min);
+  const double dlnk = (lnkmax - lnkmin)/((double) nR - 1.0);
+  const double lnrc = 0.5*(lnkmax + lnkmin);
+  const double nc = nR/2 + 1;
+  const double lnRmin = (nc - nR + 1)*dlnk - lnrc;
+  const double lnRmax = nc*dlnk - lnrc;
+  const double dlnR = (lnRmax - lnRmin)/((double) nR);
+
+  if (table == 0)
+  {
+    table = (double**) malloc(sizeof(double*)*NSIZE);
+    if (table == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<NSIZE; i++) 
+    {
+      table[i] = (double*) malloc(sizeof(double)*nR);
+      if (table[i] == NULL)
       {
-        printf("lP[%d][%d] = %f\n", j, k, lP[j][k]);
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+  }
+
+  if (recompute_gs(C, G, N)) 
+  {
+    typedef fftw_complex fftwZ;
+
+    fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE); // go to log-Fourier-space
+    if (flP == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int j=0; j<NSIZE; j++)
+    {
+      flP[j] = fftw_malloc((nR/2 + 1)*sizeof(fftwZ));
+      if (flP[j] == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+    {
+      //double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+      double** lP = (double**) calloc(NSIZE, sizeof(double*));
+      if (lP == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      //fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      fftw_plan* plan = (fftw_plan*) calloc(NSIZE, sizeof(fftw_plan));
+      if (plan == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int j=0; j<NSIZE; j++)
+      {
+        //lP[j] = (double*) malloc(nR*sizeof(double));
+        lP[j] = (double*) calloc(nR, sizeof(double));
+        if (lP[j] == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        plan[j] = fftw_plan_dft_r2c_1d(nR, lP[j], flP[j], FFTW_ESTIMATE);
+      }
+      // --------------------------------------------------------------------------------
+      // Power spectrum on logarithmic bins (begins) 
+      // --------------------------------------------------------------------------------    
+      FILE *fp;
+      fp = fopen("/home/tanida/cocoa_private/test_Pk_compare/cocoa_pk.dat", "w");
+      if (fp == NULL) {
+          perror("Error opening file");
+          return 1;
+      }
+      #pragma omp parallel for collapse(2)
+      for (int m=0; m<NSIZE; m++)
+      {
+        for (int p=0; p<nR; p++)
+        {
+          const int ZLNZ = ZL(m);
+          const double k = exp(lnrc + (p - nc)*dlnk);//[h(Mpc)^-1]?
+          
+          //const double aLNZ = 1.0/(ZLNZ + 1.0);
+          const double aLNZ = 1.0/(zmean(m) + 1.0);
+          //const double aLNZ = 1.0/(0.2607 + 1.0);
+          
+          //printf("ZLNZ[%d] = %f\n", m, zmean(m));//for debug 24/05/03
+          
+          //lP[m][p] = ((2.77536627*pow(10,11))*pow(10, -12)) * k * (p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));//<-back to here
+          lP[m][p] =  k * (p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));
+          fprintf(fp,"%f %f\n", k, p_lin(k*299792.458/100, aLNZ)*pow(299792.458/100, 3));
+        }
+      }
+      fclose(fp);
+      // --------------------------------------------------------------------------------
+      // Power spectrum on logarithmic bins (ends)
+      // --------------------------------------------------------------------------------
+      #pragma omp parallel for
+      for (int j=0; j<NSIZE; j++)
+      {
+        fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+      }
+      for (int j=0; j<NSIZE; j++)
+      {
+        fftw_free(lP[j]);
+        fftw_destroy_plan(plan[j]);
+      }
+      free(lP);
+      free(plan);
+    }
+      for (int j = 0; j < NSIZE; j++)
+      {
+        for (int i = 0; i < nR/2 + 1; i++)
+        {
+        //printf("flP[%d][%d] = (%f, %f)\n", j, i, flP[j][i][0], flP[j][i][1]);
+        }
+      }
+    double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+    fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+    fftwZ** conv = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+    fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+    double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
+    for (int j=0; j<NSIZE; j++)
+    {
+      const int COVSZ = (nR/2+1);
+      lP[j] = (double*) malloc(nR*sizeof(double));
+      kernel[j] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
+      conv[j] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
+      plan[j] = fftw_plan_dft_c2r_1d(nR, conv[j], lP[j], FFTW_ESTIMATE);
+      tab[j] = (double**) malloc(sizeof(double*)*1);
+      tab[j][0] = (double*) malloc(sizeof(double)*nR);
+    }
+    #pragma omp parallel for
+    for (int j=0; j<NSIZE; j++)
+    {
+      double arg[2];
+      arg[0] = 0; // bias
+      arg[1] = 0; // order of Bessel function
+      //arg[1] = 0; // test for hankel transform of Gaussian 240712
+
+      for (int i=0; i<(nR/2+1); i++)
+      {
+        const double kk = 2*M_PI*i/(dlnk*nR);
+        //printf("kk[%d] = %f\n", i, kk);
+
+        hankel_kernel_FT(kk, kernel[j], arg, 2);
+   
+        conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] - flP[j][i][1]*kernel[j][0][1];
+        conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] + flP[j][i][0]*kernel[j][0][1];
+      }
+
+      // force Nyquist- and 0-frequency-components to be double
+      conv[j][0][1] = 0;
+      conv[j][nR/2][1] = 0;
+
+      fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+
+      for (int k=0; k<nR; k++)
+      {
+        const double t = exp((nc - k)*dlnk - lnrc); // R=1/k
+        tab[j][0][nR-k-1] = lP[j][k]/(t*2*M_PI*nR);
+      }
+      
+      for (int k=0; k<nR; k++)
+      {
+        table[j][k] = tab[j][0][k];
       }
     }
     for (int j=0; j<NSIZE; j++)
@@ -2735,7 +2986,6 @@ double DeltaSigma_flatsky(const double R, const int ni, const int nj, const int 
     exit(1);
   }
   if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.clustering_Nbin - 1)
-  //if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d, %d]", ni, nj);
     exit(1);
