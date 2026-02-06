@@ -1,0 +1,232 @@
+  # WL photo-z errors
+  hsc_DZ_S1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,hsc}^1
+  # hsc_DZ_S2:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   proposal: 0.002
+  #   latex: \Delta z_\mathrm{s,hsc}^2
+  # hsc_DZ_S3:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   proposal: 0.002
+  #   latex: \Delta z_\mathrm{s,hsc}^3
+  # hsc_DZ_S4:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   proposal: 0.002
+  #   latex: \Delta z_\mathrm{s,hsc}^4
+  # hsc_DZ_S5:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.002
+  #   proposal: 0.002
+  #   latex: \Delta z_\mathrm{s,hsc}^5
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # Intrinsic alignment
+  hsc_A1_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.7
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,hsc}^1
+  hsc_A1_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.7
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,hsc}^2
+  # hsc_A1_3:
+  #   value: 0
+  #   latex: A_\mathrm{1-IA,hsc}^3
+  # hsc_A1_4:
+  #   value: 0
+  #   latex: A_\mathrm{1-IA,hsc}^4
+  # hsc_A1_5:
+  #   value: 0
+  #   latex: A_\mathrm{1-IA,hsc}^5
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  hsc_A2_1:
+    value: 0.0
+    #prior:
+    #  min: -5
+    #  max:  5
+    #ref:
+    #  dist: norm
+    #  loc: -1.36
+    #  scale: 0.5
+    #proposal: 0.5
+    latex: A_\mathrm{2-IA,hsc}^1
+  # hsc_A2_2:
+  #   value: 0.0
+  #   #prior:
+  #   #  min: -5
+  #   #  max:  5
+  #   #ref:
+  #   #  dist: norm
+  #   #  loc: -2.5
+  #   #  scale: 0.5
+  #   #proposal: 0.5
+  #   latex: A_\mathrm{2-IA,hsc}^2
+  # hsc_A2_3:
+  #   value: 0
+  #   latex: A_\mathrm{2-IA,hsc}^3
+  # hsc_A2_4:
+  #   value: 0
+  #   latex: A_\mathrm{2-IA,hsc}^4
+  # hsc_A2_5:
+  #   value: 0
+  #   latex: A_\mathrm{2-IA,hsc}^5
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  hsc_BTA_1:
+    value: 0.0
+    #prior:
+    #  min: 0
+    #  max: 2
+    #ref:
+    #  dist: norm
+    #  loc: 1
+    #  scale: 0.15
+    #proposal: 0.1
+    latex: A_\mathrm{BTA-IA,hsc}^1
+  # hsc_BTA_2:
+  #   value: 0
+  #   latex: A_\mathrm{BTA-IA,hsc}^2
+  # hsc_BTA_3:
+  #   value: 0
+  #   latex: A_\mathrm{BTA-IA,hsc}^3
+  # hsc_BTA_4:
+  #   value: 0
+  #   latex: A_\mathrm{BTA-IA,hsc}^4
+  # hsc_BTA_5:
+  #   value: 0
+  #   latex: A_\mathrm{BTA-IA,hsc}^5
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # Shear calibration parameters
+  hsc_M1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{hsc}^1
+  # hsc_M2:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: m_\mathrm{hsc}^2
+  # hsc_M3:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: m_\mathrm{hsc}^3
+  # hsc_M4:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: m_\mathrm{hsc}^4
+  # hsc_M5:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: m_\mathrm{hsc}^5
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # BARYON PCA
+  hsc_BARYON_Q1:
+    value: 0.0
+    latex: Q1_\mathrm{hsc}^1
+  hsc_BARYON_Q2:
+    value: 0.0
+    latex: Q2_\mathrm{hsc}^2
+  hsc_BARYON_Q3:
+    value: 0.0
+    latex: Q3_\mathrm{hsc}^3
+  hsc_BARYON_Q4:
+    value: 0.0
+    latex: Q4_\mathrm{hsc}^4

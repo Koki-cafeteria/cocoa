@@ -1,0 +1,43 @@
+path: null
+data_file: velocileptors_example.dataset
+accuracyboost: 1.0
+samplingboost: 1.0
+integration_accuracy: 0
+kmax_boltzmann: 5.0
+speed: 1
+non_linear_emul: 2
+
+# velocileptors統合設定
+use_velocileptors: True
+velocileptors_path: ./external_modules/code/velocileptors
+
+# 結果をファイルに出力（オプション）
+print_velocileptors_pk: True
+velocileptors_pk_output_file: "./projects/mg_hsc_y3/data/velocileptors_pk_multipoles.txt"
+
+# 注意: 以下の設定は.datasetファイルから読み込まれる（.datasetにない場合のみYAMLの値が使われる）
+# 推奨: .datasetファイルに設定を追加する（theta_min_arcminなどと同様）
+velocileptors_k_min: 5e-3      # kの最小値 [h/Mpc]（.dataset優先）
+velocileptors_k_max: 0.3       # kの最大値 [h/Mpc]（.dataset優先）
+velocileptors_nk: 50           # k-binの数（.dataset優先）
+velocileptors_z_eff: 0.5       # 有効赤方偏移（.dataset優先）
+
+# データファイル（オプション: データがない場合は理論値のみ計算）
+# velocileptors_data_file: ./projects/mg_hsc_y3/data/velocileptors_data.txt
+# velocileptors_cov_file: ./projects/mg_hsc_y3/data/velocileptors_cov.txt
+# velocileptors_mask_file: ./projects/mg_hsc_y3/data/velocileptors_mask.txt
+
+# velocileptors用のバイアスパラメータのデフォルト値
+velocileptors_bias_defaults:
+  b1: 2.0      # 線形バイアス
+  b2: 0.0      # 2次バイアス
+  bs: 0.0      # シアーバイアス
+  b3: 0.0      # 3次バイアス
+  alpha0: 0.0  # カウンター項（monopole）
+  alpha2: 0.0  # カウンター項（quadrupole）
+  alpha4: 0.0  # カウンター項（hexadecapole）
+  SN0: 0.0     # 確率的項（monopole）
+  SN2: 0.0     # 確率的項（quadrupole）
+
+params: !defaults [mg_hsc_y3_params_lens, mg_hsc_y3_params_source]
+

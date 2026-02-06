@@ -1,0 +1,15 @@
+*.o
+*.cfg
+*.pyc
+*.so
+*.pyo
+*.dSYM
+*.mod
+.DS_Store
+**/chains/
+**/patchy_mocks_*/
+**/data/planck/
+**/.ipynb_checkpoints/
+**/__pycache__/
+Cocoa_snapshots/
+*.pdf

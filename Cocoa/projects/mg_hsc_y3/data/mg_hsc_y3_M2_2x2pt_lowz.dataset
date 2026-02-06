@@ -1,0 +1,18 @@
+data_file = mg_hsc_y3_theory32_all.modelvector
+cov_file = mg_hsc_y3_cov_transformed
+mask_file = mg_hsc_y3_M2_2x2pt_lowz.mask
+nz_lens_file = mg_hsc_y3_lens_delta.nz 
+nz_source_file = mg_hsc_y3_source.nz 
+lensing_overlap_cut = 0.00
+lens_ntomo = 1
+source_ntomo = 1
+n_theta = 30
+n_R =30
+theta_min_arcmin = 2.822145388443246250e-01
+theta_max_arcmin = 3.189063198818608384e+02
+R_min = 5.654210907367492739e-02
+R_max = 7.074373534223781235e+01
+R_wp_min = 5.441333408492011747e-01 
+R_wp_max = 7.351139325073161501e+01
+
+baryon_pca_file = mg_hsc_y3_pca.txt

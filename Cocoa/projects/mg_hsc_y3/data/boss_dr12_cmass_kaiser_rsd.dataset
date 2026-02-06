@@ -1,0 +1,28 @@
+# BOSS DR12 CMASS Kaiser RSD用データファイル
+data_file = boss_dr12_cmass_datavector.txt
+cov_file = boss_dr12_cmass_covariance.txt
+mask_file = boss_dr12_cmass_mask.txt
+
+# レンズサンプル（バイアス用）
+# BOSS DR12 CMASS用のn(z)ファイル（Density_galaxies_cmass_ngc_v5.txtから変換）
+nz_lens_file = boss_dr12_cmass.nz
+lens_ntomo = 1
+
+# Source sample（Kaiser単独では不要だが、init_lens_sampleのチェック回避のため必要）
+nz_source_file = mg_hsc_y3_source.nz
+source_ntomo = 1
+
+# IAモデル（Kaiser単独では不要だが、エラー回避のため設定）
+IA_model = 0
+IA_redshift_evolution = 0
+
+# P(k,z)用パラメータ（BOSS DR12 CMASSに合わせて設定）
+Nk = 40
+k_min = 0.007424
+k_max = 0.395040
+Nz = 1
+z_min = 0.589341
+z_max = 0.589341
+
+# BOSSのk_effをカスタムk配列として使用
+k_bins_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/boss_dr12_cmass_k_bins.txt

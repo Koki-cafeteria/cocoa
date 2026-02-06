@@ -1,0 +1,26 @@
+path: null
+# 250728: P(k)用の新しいdatasetファイルを指定
+data_file: kaiser_rsd_data.dataset 
+accuracyboost: 1.0
+samplingboost: 1.0
+integration_accuracy: 0
+kmax_boltzmann: 5.0
+speed: 1
+non_linear_emul: 2
+
+# 250728: IA関連のパラメータは不要なため削除
+IA_redshift_evolution: 0
+IA_model: 0 
+
+print_intermediate_products: False
+
+# 250728: Baryon PCA関連の設定は一旦削除
+# use_baryonic_simulations_for_dv_contamination: False ...
+
+print_datavector: False
+print_datavector_file: "./projects/mg_hsc_y3/chains/mg_hsc_y3_kaiser_RSD_theory.modelvector"
+
+params:
+  # 250728: P(k)はレンズ銀河のバイアスにのみ依存するため、レンズ銀河のパラメータのみ読み込む
+  # Source銀河のパラメータは不要
+  !defaults [mg_hsc_y3_params_lens]

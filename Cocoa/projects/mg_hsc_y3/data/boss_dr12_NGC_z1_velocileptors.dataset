@@ -1,0 +1,7 @@
+velocileptors_k_min = 0.015639
+velocileptors_k_max = 0.095126
+velocileptors_nk = 7
+velocileptors_z_eff = 0.38
+velocileptors_data_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/boss_dr12_NGC_z1_velocileptors_vector.txt
+velocileptors_cov_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/boss_dr12_NGC_z1_velocileptors_cov.txt
+velocileptors_mask_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/boss_dr12_NGC_z1_velocileptors_mask_p0p2.txt

@@ -1,0 +1,15 @@
+# Velocileptors P0/P2フィット用の.datasetファイル
+# 元データ: ./projects/mg_hsc_y3/data/velocileptors_pk_multipoles.txt
+
+# k-bin設定
+velocileptors_k_min = 7.424e-3
+velocileptors_k_max = 0.395040
+velocileptors_nk = 40
+
+# 有効赤方偏移
+velocileptors_z_eff = 0.5893
+
+# データ・共分散・マスク（P0,P2のみ使用）
+velocileptors_data_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/velocileptors_pk_multipoles_vector.txt
+velocileptors_cov_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/velocileptors_pk_multipoles_cov_diag.txt
+velocileptors_mask_file = /home/tanida/cocoa_v41/cocoa/Cocoa/projects/mg_hsc_y3/data/velocileptors_pk_multipoles_mask_p0p2.txt

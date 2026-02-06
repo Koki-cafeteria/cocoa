@@ -1,0 +1,25 @@
+# Velocileptors用の.datasetファイル例（2x2pt関連の設定は不要）
+
+# velocileptors設定
+# k-bin設定
+velocileptors_k_min = 7.424e-3      
+velocileptors_k_max = 0.395040      
+velocileptors_nk = 50          
+
+# 有効赤方偏移
+# データの平均z (Kaiser RSDに合わせる)
+velocileptors_z_eff = 0.5893       
+
+# （オプション）理論と比較する実データを使う場合のみ設定
+# velocileptors_data_file = ./projects/mg_hsc_y3/data/velocileptors_data.txt
+# velocileptors_cov_file = ./projects/mg_hsc_y3/data/velocileptors_cov.txt
+# velocileptors_mask_file = ./projects/mg_hsc_y3/data/velocileptors_mask.txt
+
+# 注意: velocileptors_pathとvelocileptors_bias_defaultsは
+# .datasetファイルからは読み込まれません（YAMLから指定）
+
+# パフォーマンスノート:
+# nk=30: DESIスタイルの標準的な点数（計算速度と精度のバランスが良い）
+# nk=50: より高精度だが計算時間が約1.5-2倍長くなる
+# nk=20: 高速だが精度が落ちる可能性あり
+

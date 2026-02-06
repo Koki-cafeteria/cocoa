@@ -1,0 +1,168 @@
+timing: True
+debug: True
+stop_at_error: True
+
+likelihood:
+  # 250728: 新しく作成したLikelihoodクラスを指定
+  mg_hsc_y3.mg_hsc_y3_kaiser_RSD:
+    path: ./external_modules/data/mg_hsc_y3
+    # data_file: kaiser_rsd_data.dataset  # ダミーデータ用
+    data_file: boss_dr12_cmass_kaiser_rsd.dataset  # BOSS DR12 CMASS用
+    print_datavector: True
+    print_datavector_file: "./projects/mg_hsc_y3/data/mg_hsc_y3_theory_kaiser_rsd_boss_dr12.modelvector"
+    
+params:
+  # 宇宙論パラメータは基本的に3x2ptと同じ
+  mu0:
+    prior: {min: -6.0, max: 6.0}
+    ref: {dist: norm, loc: 0.0, scale: 0.65}
+    proposal: 0.4
+    latex: \mu_0
+  sigma0:
+    prior: {min: -6.0, max: 6.0}
+    ref: {dist: norm, loc: 0.0, scale: 0.65}
+    proposal: 0.4
+    latex: \Sigma_0
+  As_1e9:
+    prior: {min: 0.5, max: 5}
+    ref: {dist: norm, loc: 2.1, scale: 0.65}
+    proposal: 0.4
+    latex: 10^9 A_\mathrm{s}
+    drop: true
+    renames: A
+  ns:
+    prior: {min: 0.87, max: 1.07}
+    ref: {dist: norm, loc: 0.96605, scale: 0.01}
+    proposal: 0.01
+    latex: n_\mathrm{s}
+  H0:
+    prior: {min: 55, max: 91}
+    ref: {dist: norm, loc: 67.32, scale: 5}
+    proposal: 3
+    latex: H_0
+  omegab:
+    prior: {min: 0.03, max: 0.07}
+    ref: {dist: norm, loc: 0.0495, scale: 0.004}
+    proposal: 0.004
+    latex: \Omega_\mathrm{b}
+    drop: true
+  omegam:
+    prior: {min: 0.1, max: 0.9}
+    ref: {dist: norm, loc: 0.316, scale: 0.02}
+    proposal: 0.02
+    latex: \Omega_\mathrm{m}
+    drop: true
+  mnu:
+    value: 0.06 # 固定
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  tau:
+    value: 0.0697186
+
+  # 250728: IAやShear Nuisanceは不要なので定義しない
+  # hsc_DZ_S1, hsc_M1, hsc_A1_1 など
+  
+  # 250728: レンズ銀河のバイアスパラメータは必要（3x2pt用）
+  hsc_B1_1:
+    prior: {min: 0.5, max: 4.0}
+    ref: {dist: norm, loc: 1.8, scale: 0.2}
+    proposal: 0.1
+    latex: b_1^1
+  hsc_B1_2:
+    prior: {min: 0.5, max: 4.0}
+    ref: {dist: norm, loc: 2.2, scale: 0.2}
+    proposal: 0.1
+    latex: b_1^2
+  hsc_B1_3:
+    prior: {min: 0.5, max: 4.0}
+    ref: {dist: norm, loc: 2.3, scale: 0.2}
+    proposal: 0.1
+    latex: b_1^3
+
+  # 250801: Kaiser RSD用のバイアスパラメータ（BOSS DR12はNz=1なので1個のみ）
+  hsc_B_KAISER_RSD_1:
+    prior: {min: 0.5, max: 4.0}
+    ref: {dist: norm, loc: 2.0, scale: 0.2}
+    proposal: 0.1
+    latex: b_{\mathrm{RSD}}^1
+
+  # Derived Parameters は3x2ptと同様
+  As:
+    value: 'lambda As_1e9: 1e-9 * As_1e9'
+    latex: A_\mathrm{s}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    latex: w_{a,\mathrm{DE}}
+  omegabh2:
+    value: 'lambda omegab, H0: omegab*(H0/100)**2'
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{c} h^2
+  omegal:
+    latex: \Omega_\Lambda
+  sigma8:
+    latex: \sigma_8
+
+theory:
+  camb:
+    path: ./external_modules/code/MGCAMB
+    stop_at_error: False
+    use_renames: True
+    extra_args:
+      MG_flag: 1
+      pure_MG_flag: 2
+      # 250728: 線形物質パワースペクトルを使うため、halofit_versionはコメントアウト
+      # halofit_version: linear  # MGCAMBでは'linear'はサポートされていない
+      AccuracyBoost: 1.5
+      lens_potential_accuracy: 1.0
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      dark_energy_model: ppf
+      accurate_massive_neutrino_transfers: false
+      k_per_logint: 20
+
+sampler:
+  evaluate:
+    N: 1
+    override:
+      # 宇宙論パラメータのテスト値
+      mu0: 0.0
+      sigma0: 0.0
+      As_1e9: 2.2065
+      ns: 0.9645
+      H0: 67.089
+      omegab: 0.049434
+      omegam: 0.3156
+      w0pwa: -1.0
+      w: -1.0
+      # wはparamsセクションで固定値として定義されているので、override不要
+      # 250728: レンズバイアスのテスト値は残す (ただし現状の計算では使われない)
+      hsc_B1_1: 1.877122
+      hsc_B1_2: 2.290616
+      hsc_B1_3: 2.340327
+      # 250801: Kaiser RSD用バイアスのテスト値（BOSS DR12はNz=1なので1個のみ使用）
+      # hsc_B_KAISER_RSD_1: 4.0  # BOSS DR12 CMASS用のバイアス値（要調整）
+      hsc_B_KAISER_RSD_1: 2.234  # Velocileptorsに合わせる: (1.36/0.608835)-1 = b1 at z=0.5893
+      # 250728: 不要なNuisanceパラメータはoverrideセクションからも削除
+
+output: ./projects/mg_hsc_y3/chains/EXAMPLE_EVALUATE_kaiser_RSD

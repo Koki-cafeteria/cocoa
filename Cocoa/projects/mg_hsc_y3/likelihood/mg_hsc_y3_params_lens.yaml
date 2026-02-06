@@ -1,0 +1,165 @@
+ # Lensing photo-z errors
+  hsc_DZ_L1:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,hsc}^1
+  hsc_DZ_L2:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,hsc}^2
+  hsc_DZ_L3:
+    prior:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,hsc}^3
+  # hsc_DZ_L4:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: \Delta z_\mathrm{l,hsc}^4
+  # hsc_DZ_L5:
+  #   prior:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   ref:
+  #     dist: norm
+  #     loc: 0.0
+  #     scale: 0.005
+  #   proposal: 0.005
+  #   latex: \Delta z_\mathrm{l,hsc}^5
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # Bin bias parameters
+  hsc_B1_1:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.24
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-hsc}^1
+  hsc_B1_2:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.36
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-hsc}^2
+  hsc_B1_3:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.47
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-hsc}^3
+  # hsc_B1_4:
+  #   prior:
+  #     min: 0.8
+  #     max: 3
+  #   ref:
+  #     dist: norm
+  #     loc: 1.60
+  #     scale: 0.15
+  #   proposal: 0.1
+  #   latex: b_\mathrm{1-hsc}^4
+  # hsc_B1_5:
+  #   prior:
+  #     min: 0.8
+  #     max: 3
+  #   ref:
+  #     dist: norm
+  #     loc: 1.76
+  #     scale: 0.1
+  #   proposal: 0.1
+  #   latex: b_\mathrm{1-hsc}^5
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  hsc_B2_1:
+    value: 0.0
+    latex: b_\mathrm{2-hsc}^1
+  hsc_B2_2:
+    value: 0.0
+    latex: b_\mathrm{2-hsc}^2
+  hsc_B2_3:
+    value: 0.0
+    latex: b_\mathrm{2-hsc}^3
+  hsc_B2_4:
+    value: 0.0
+    latex: b_\mathrm{2-hsc}^4
+  hsc_B2_5:
+    value: 0.0
+    latex: b_\mathrm{2-hsc}^5
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  hsc_BMAG_1:
+    value: 0.0
+    latex: b_\mathrm{BMAG-hsc}^1
+  hsc_BMAG_2:
+    value: 0.0
+    latex: b_\mathrm{BMAG-hsc}^2
+  hsc_BMAG_3:
+    value: 0.0
+    latex: b_\mathrm{BMAG-hsc}^3
+  hsc_BMAG_4:
+    value: 0.0
+    latex: b_\mathrm{BMAG-hsc}^4
+  hsc_BMAG_5:
+    value: 0.0
+    latex: b_\mathrm{BMAG-hsc}^5
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # Point Mass parameters
+  hsc_PM1:
+    value: 0.0
+    latex: PM_\mathrm{hsc}^1
+  hsc_PM2:
+    value: 0.0
+    latex: PM_\mathrm{hsc}^2
+  hsc_PM3:
+    value: 0.0
+    latex: PM_\mathrm{hsc}^3
+  hsc_PM4:
+    value: 0.0
+    latex: PM_\mathrm{hsc}^4
+  hsc_PM5:
+    value: 0.0
+    latex: PM_\mathrm{hsc}^5
