@@ -1,0 +1,139 @@
+theory:
+  camb:
+    path: ./external_modules/code/MGCAMB
+    stop_at_error: false
+    use_renames: true
+    extra_args:
+      MG_flag: 1
+      pure_MG_flag: 2
+      AccuracyBoost: 1.5
+      lens_potential_accuracy: 1.0
+      num_massive_neutrinos: 0
+      nnu: 3.046
+      dark_energy_model: ppf
+      accurate_massive_neutrino_transfers: false
+      k_per_logint: 20
+likelihood:
+  mg_hsc_y3.mg_hsc_y3_velocileptors:
+    path: ./projects/mg_hsc_y3/data
+    data_file: boss_dr12_NGC_z1_new_mock.dataset
+    use_velocileptors: true
+    velocileptors_path: ./external_modules/code/velocileptors
+    print_velocileptors_pk: true
+    velocileptors_pk_output_file: ./projects/mg_hsc_y3/data/velocileptors_pk_multipoles_new_mock.txt
+    accuracyboost: 1.0
+    integration_accuracy: 0
+    kmax_boltzmann: 2.0
+    non_linear_emul: 2
+params:
+  # --- Truth Parameters ---
+  mu0:
+    value: 0.0
+  sigma0:
+    value: 0.0
+  As_1e9:
+    value: 2.2065
+    drop: true
+    renames: A
+  ns:
+    value: 0.9645
+  H0:
+    value: 67.089
+  omegab:
+    value: 0.049434
+    drop: true
+  omegam:
+    value: 0.3156
+    drop: true
+  mnu:
+    value: 0.0
+
+  # --- Fixed Parameters (Dark Energy) ---
+  w0pwa:
+    value: -1.0
+  w:
+    value: -1.0
+  tau:
+    value: 0.0697186
+
+  # --- Truth Parameters (Velocileptors Bias) ---
+  velocileptors_b1plus1_sigma8:
+    value: 2.0
+  velocileptors_b2_sigma8_sq:
+    value: 0.0
+  velocileptors_bs_sigma8_sq:
+    value: 0.0
+  velocileptors_b3:
+    value: 0.0
+  velocileptors_alpha0:
+    value: 0.0
+  velocileptors_alpha2:
+    value: 0.0
+  velocileptors_alpha4:
+    value: 0.0
+  velocileptors_SN0:
+    value: 0.0
+  velocileptors_SN2:
+    value: 0.0
+
+  # --- Fixed Parameters (HSC Project Nuisance) ---
+  hsc_DZ_L1:
+    value: 0.0
+  hsc_DZ_L2:
+    value: 0.0
+  hsc_DZ_L3:
+    value: 0.0
+  hsc_B1_1:
+    value: 1.24
+  hsc_B1_2:
+    value: 1.36
+  hsc_B1_3:
+    value: 1.47
+  hsc_DZ_S1:
+    value: 0.0
+  hsc_A1_1:
+    value: 0.7
+  hsc_A1_2:
+    value: -1.7
+  hsc_M1:
+    value: 0.0
+
+  # Derived Parameters
+  As:
+    value: 'lambda As_1e9: 1e-9 * As_1e9'
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+  omegabh2:
+    value: 'lambda omegab, H0: omegab*(H0/100)**2'
+  omegach2:
+    value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+  omegal:
+    latex: \Omega_\Lambda
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+  sigma8:
+    latex: \sigma_8
+  s8h5:
+    derived: 'lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)'
+  s8omegamp5:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.5'
+  s8omegamp25:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.25'
+  age:
+    latex: '{\rm{Age}}/\mathrm{Gyr}'
+  rdrag:
+    latex: r_\mathrm{drag}
+  yheused:
+    latex: Y_P^\mathrm{BBN}
+  omegan2:
+    latex: \Omega_\mathrm{\\nu} h^2
+  omegan:
+    derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
+
+sampler:
+  evaluate:
+    N: 1
+
+timing: true
+stop_at_error: false
+output: projects/mg_hsc_y3/chains/GENERATE_MOCK_velocileptors_new

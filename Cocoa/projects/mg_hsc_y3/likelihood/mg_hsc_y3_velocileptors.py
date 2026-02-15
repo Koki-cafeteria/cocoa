@@ -302,4 +302,3 @@ class mg_hsc_y3_velocileptors(_cosmolike_prototype_base):
     chi2 = np.dot(diff, np.dot(self.inv_cov, diff))
     
     return -0.5 * chi2
-
