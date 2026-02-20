@@ -229,20 +229,20 @@ class mg_hsc_y3_velocileptors(_cosmolike_prototype_base):
                       kind='linear', fill_value='extrapolate', 
                       assume_sorted=True)(z_eff)
     
+    # DEBUG: パラメータ変換の監視
+    b1plus1_sigma8 = self.provider.get_param('velocileptors_b1plus1_sigma8')
+    b2_sigma8_sq = self.provider.get_param('velocileptors_b2_sigma8_sq')
+    bs_sigma8_sq = self.provider.get_param('velocileptors_bs_sigma8_sq')
+    
     # DESIスタイルのパラメータから実際のb1, b2, bsを計算
     bias_params = {}
-    
-    # (1+b1)*sigma8 から b1 を計算
-    b1plus1_sigma8 = self.provider.get_param('velocileptors_b1plus1_sigma8')
     bias_params['b1'] = (b1plus1_sigma8 / sigma8) - 1.0
-    
-    # b2*sigma8^2 から b2 を計算
-    b2_sigma8_sq = self.provider.get_param('velocileptors_b2_sigma8_sq')
     bias_params['b2'] = b2_sigma8_sq / (sigma8 ** 2)
-    
-    # bs*sigma8^2 から bs を計算
-    bs_sigma8_sq = self.provider.get_param('velocileptors_bs_sigma8_sq')
     bias_params['bs'] = bs_sigma8_sq / (sigma8 ** 2)
+
+    self.log.info(f"DEBUG MCMC: sigma8={sigma8:.6e}, b1plus1_s8={b1plus1_sigma8:.4f} -> b1={bias_params['b1']:.4f}")
+    self.log.info(f"DEBUG MCMC: b2_s8sq={b2_sigma8_sq:.4f} -> b2={bias_params['b2']:.4f}, bs_s8sq={bs_sigma8_sq:.4f} -> bs={bias_params['bs']:.4f}")
+
     
     # その他のパラメータは直接取得
     for param_name in ['b3', 'alpha0', 'alpha2', 'alpha4', 'SN0', 'SN2']:
@@ -268,7 +268,7 @@ class mg_hsc_y3_velocileptors(_cosmolike_prototype_base):
     if self.print_velocileptors_pk:
       output_data = np.column_stack([kv, p0, p2, p4])
       np.savetxt(self.velocileptors_pk_output_file, output_data,
-                fmt='%.8e',
+                fmt='%.18e',
                 header='k[h/Mpc]  P0  P2  P4',
                 comments='# ')
       self.log.info(f'Velocileptors P(k) multipoles saved to {self.velocileptors_pk_output_file}')
