@@ -19,8 +19,7 @@ likelihood:
     data_file: boss_dr12_NGC_z1_new_mock.dataset
     use_velocileptors: true
     velocileptors_path: ./external_modules/code/velocileptors
-    print_velocileptors_pk: true
-    velocileptors_pk_output_file: ./projects/mg_hsc_y3/data/velocileptors_pk_multipoles_new_mock.txt
+    print_velocileptors_pk: false
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 2.0
@@ -31,22 +30,31 @@ params:
     prior:
       min: -3.0
       max: 3.0
-    ref: 0.0
-    proposal: 0.05
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.1
+    proposal: 0.005
     latex: \mu_0
   sigma0:
     prior:
       min: -3.0
       max: 3.0
-    ref: 0.0
-    proposal: 0.05
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.1
+    proposal: 0.005
     latex: \Sigma_0
   As_1e9:
     prior:
       min: 0.5
       max: 5
-    ref: 2.2065
-    proposal: 0.4
+    ref:
+      dist: norm
+      loc: 2.2065
+      scale: 0.1
+    proposal: 0.04
     latex: 10^9 A_\mathrm{s})
     drop: true
     renames: A
@@ -54,30 +62,42 @@ params:
     prior:
       min: 0.87
       max: 1.07
-    ref: 0.9645
-    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 0.9645
+      scale: 0.01
+    proposal: 0.001
     latex: n_\mathrm{s}
   H0:
     prior:
       min: 55
       max: 91
-    ref: 67.089
-    proposal: 1.0
+    ref:
+      dist: norm
+      loc: 67.089
+      scale: 1.0
+    proposal: 0.1
     latex: H_0
   omegab:
     prior:
       min: 0.03
       max: 0.07
-    ref: 0.049434
-    proposal: 0.005
+    ref:
+      dist: norm
+      loc: 0.049434
+      scale: 0.002
+    proposal: 0.0005
     latex: \Omega_\mathrm{b}
     drop: true
   omegam:
     prior:
       min: 0.1
       max: 0.9
-    ref: 0.3156
-    proposal: 0.01
+    ref:
+      dist: norm
+      loc: 0.3156
+      scale: 0.01
+    proposal: 0.001
     latex: \Omega_\mathrm{m}
     drop: true
   mnu:
@@ -100,24 +120,33 @@ params:
     prior:
       min: 0.0
       max: 3.0
-    ref: 2.0
-    proposal: 0.1
+    ref:
+      dist: norm
+      loc: 2.0
+      scale: 0.1
+    proposal: 0.01
     latex: (1+b_{1})\sigma_{8}
   velocileptors_b2_sigma8_sq:
     prior:
       dist: norm
       loc: 0.0
       scale: 5.0
-    ref: 0.0
-    proposal: 0.5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.05
     latex: b_{2}\sigma_{8}^{2}
   velocileptors_bs_sigma8_sq:
     prior:
       dist: norm
       loc: 0.0
       scale: 5.0
-    ref: 0.0
-    proposal: 0.5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.05
     latex: b_{s}\sigma_{8}^{2}
   velocileptors_b3:
     value: 0.0
@@ -127,40 +156,55 @@ params:
       dist: norm
       loc: 0.0
       scale: 12.5
-    ref: 0.0
-    proposal: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.1
     latex: \alpha_0
   velocileptors_alpha2:
     prior:
       dist: norm
       loc: 0.0
       scale: 12.5
-    ref: 0.0
-    proposal: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.1
     latex: \alpha_2
   velocileptors_alpha4:
     prior:
       dist: norm
       loc: 0.0
       scale: 12.5
-    ref: 0.0
-    proposal: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 1.0
+    proposal: 0.1
     latex: \alpha_4
   velocileptors_SN0:
     prior:
       dist: norm
       loc: 0.0
       scale: 2.0
-    ref: 0.0
-    proposal: 0.5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.2
+    proposal: 0.05
     latex: \mathrm{SN}_0
   velocileptors_SN2:
     prior:
       dist: norm
       loc: 0.0
       scale: 5.0
-    ref: 0.0
-    proposal: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.1
     latex: \mathrm{SN}_2
 
   # --- Fixed Parameters (HSC Project Nuisance) ---
