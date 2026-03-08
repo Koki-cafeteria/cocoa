@@ -327,6 +327,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         sys.path.insert(0, velocileptors_path)
       
       from velocileptors.LPT.moment_expansion_fftw import MomentExpansion
+      from scipy.interpolate import interp1d
       
       # MGCAMBから線形P(k)を取得
       h = self.provider.get_param("H0")/100.0
@@ -345,30 +346,29 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         
         k_bins_data = np.loadtxt(k_bins_file)
         if k_bins_data.ndim == 2:
-          k_bins = k_bins_data[:, 1]  # 2列目がk-bins
+          k_bins_output = k_bins_data[:, 1]  # 2列目がk-bins（最終的に出力するk値）
         else:
-          k_bins = k_bins_data
-        nk = len(k_bins)
-        k_min = k_bins[0]   # k_binsから最小値を取得
-        k_max = k_bins[-1]  # k_binsから最大値を取得
-        self.log.info(f'Using k-bins from file: {k_bins_file} (nk={nk}, k_min={k_min:.6f}, k_max={k_max:.6f})')
+          k_bins_output = k_bins_data
+        self.log.info(f'Using k-bins from file: {k_bins_file} (nk={len(k_bins_output)}, k_min={k_bins_output[0]:.6f}, k_max={k_bins_output[-1]:.6f})')
       else:
         # .datasetファイルまたはYAMLから読み込まれた値を使用
-        k_min = self.velocileptors_k_min
-        k_max = self.velocileptors_k_max
-        nk = self.velocileptors_nk
-        k_bins = np.logspace(np.log10(k_min), np.log10(k_max), nk)
-        self.log.info(f'Using auto-generated k-bins: k_min={k_min}, k_max={k_max}, nk={nk}')
+        k_min_out = self.velocileptors_k_min
+        k_max_out = self.velocileptors_k_max
+        nk_out = self.velocileptors_nk
+        k_bins_output = np.logspace(np.log10(k_min_out), np.log10(k_max_out), nk_out)
+        self.log.info(f'Using auto-generated k-bins: k_min={k_min_out}, k_max={k_max_out}, nk={nk_out}')
       
-      # 線形P(k)を抽出（z=z_effでの値）
-      # 注: k_bins は実際には [1/Mpc] 単位（YAMLのコメントは誤記）
-      klin = k_bins  # [h/Mpc] - Velocileptorsの期待する単位
-      plin = PKL.P(z_eff, klin * h) * (h**3)  # → [(Mpc/h)^3] に変換 (klinをMpc単位に変換してからMGCAMBに渡し、結果を(Mpc/h)^3に変換)
+      # Velocileptorsの内部計算用に広い範囲のk-gridを準備
+      # デフォルトは kmin=0.005, kmax=0.3, nk=50
+      # 出力k-binsがこの範囲内に収まるように調整
+      klin_calc = np.logspace(np.log10(0.005), np.log10(0.3), 50)  # Velocileptorsのデフォルト
+      
+      # 線形P(k)を抽出（z=z_effでの値、広い範囲で）
+      # 注: klin_calc は実際には [h/Mpc] 単位
+      plin_calc = PKL.P(z_eff, klin_calc * h) * (h**3)  # → [(Mpc/h)^3] に変換
 
-      # MomentExpansionを初期化
-      mome = MomentExpansion(klin, plin, threads=1,
-                            cutoff=10, extrap_min=-4, extrap_max=3, jn=10,
-                            nk=nk, kmin=k_min, kmax=k_max)
+      # MomentExpansionを初期化（デフォルト引数を使用）
+      mome = MomentExpansion(klin_calc, plin_calc, threads=1)
       
       # バイアスパラメータを準備（デフォルト値とマージ）
       if bias_params is None:
@@ -420,7 +420,15 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       kv, p0, p2, p4 = mome.compute_redshift_space_power_multipoles(
           pars, f_z, ngauss=4, reduced=True)
       
-      return kv, p0, p2, p4
+      # DEBUG: 返されたkv vs 入力klin
+      self.log.info(f'Velocileptors returned {len(kv)} k-points: kv[0]={kv[0]:.6f}, kv[-1]={kv[-1]:.6f}')
+      
+      # kv（内部k-grid）から、必要なk_bins_output上の値を補間で取得
+      interp_p0 = interp1d(kv, p0, kind='cubic', fill_value='extrapolate')(k_bins_output)
+      interp_p2 = interp1d(kv, p2, kind='cubic', fill_value='extrapolate')(k_bins_output)
+      interp_p4 = interp1d(kv, p4, kind='cubic', fill_value='extrapolate')(k_bins_output)
+      
+      return k_bins_output, interp_p0, interp_p2, interp_p4
       
     except ImportError as e:
       self.log.warning(f"Velocileptors import failed: {e}. Skipping velocileptors calculation.")

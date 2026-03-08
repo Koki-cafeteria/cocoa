@@ -1,0 +1,8 @@
+velocileptors_k_min = 0.025646
+velocileptors_k_max = 0.20
+velocileptors_nk = 18
+velocileptors_z_eff = 0.38
+velocileptors_k_bins_file = boss_dr12_cmass_k_bins_0.02_0.20.txt
+velocileptors_data_file = boss_dr12_NGC_z1_patchy_mean_vector_0p02_0p20.txt
+velocileptors_cov_file = boss_dr12_NGC_z1_patchy_cov_0p02_0p20.txt
+velocileptors_mask_file = boss_dr12_NGC_z1_PatchyMock_mask_kmax020.txt
